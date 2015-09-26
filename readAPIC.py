@@ -1,7 +1,7 @@
 def readAPIC(filename, artist, album, filetype):
     fp = open(filename, 'rb')
     if filetype == '.m4a':
-        covr = b'\x63\x6F\x76\x72'
+        covr = b'covr'
     elif filetype == '.mp3':
         covr = b'ID3'
     else:
@@ -22,7 +22,7 @@ def readAPIC(filename, artist, album, filetype):
         imagetype = '.jpg'
 
     if imagetype == '.jpg':
-        pic = a[start_num: end_num + 2]
+        pic = a[start_num: end_num + 3]
         while pic[2: -1].find(start) != -1:
             pic = pic[pic[2: -1].find(start) + 2:-1]
     elif imagetype == '.png':
