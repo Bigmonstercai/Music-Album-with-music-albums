@@ -10,15 +10,21 @@ import sys
 
 def gen_dict(path):
     imgdict = {}
-
+    netSize = 3
     for pic in os.listdir(path):
         img = Image.open(path + pic)
-        RGB = imageColor(img, 4)
-        img.close()
-        if RGB in imgdict:
-            imgdict[RGB] = imgdict[RGB] + [pic]
+        if img.width >= img.height:
+            img1 = img.resize(
+                (netSize, round(img.height * netSize / img.width)))
         else:
-            imgdict[RGB] = [pic]
+            img1 = img.resize(
+                (round(img.width * netSize / img.height), netSize))
+        RGB = imageColor(img1, 8)
+        if RGB in imgdict:
+            imgdict[RGB] = imgdict[RGB] + [img1]
+        else:
+            imgdict[RGB] = [img1]
+        img.close()
 
     return imgdict
 
@@ -50,7 +56,7 @@ print(imgpath)
 print('begin jointImage:%s' % time.clock())
 result = jointImage(img, imgDict)
 print('end jointImage:%s' % time.clock())
+result.show()
 img.close()
 result.save('result.jpg')
 print('over:%s' % time.clock())
-result.show()

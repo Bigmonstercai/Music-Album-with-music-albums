@@ -3,11 +3,13 @@ import math
 
 
 def quantifyImage(img, newQuan):
-        # resize
-    if img.height / 7 >= img.width / 13:
-        img = img.resize((round(img.width / (img.height / 7)) * 20, 140))
-    else:
-        img = img.resize((260, round(img.height / (img.width / 13)) * 20))
+    netSize = 3
+    # resize
+    # if img.height / 7 >= img.width / 13:
+    #     img = img.resize((round(img.width / (img.height / 7)) * 20, 140))
+    # else:
+    #     img = img.resize((260, round(img.height / (img.width / 13)) * 20))
+    img = img.resize((round(img.width / netSize), round(img.height / netSize)))
 
     for w in range(img.width):
         for h in range(img.height):

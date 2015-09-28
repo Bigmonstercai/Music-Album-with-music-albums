@@ -1,52 +1,48 @@
 ﻿from quantifyImage import quantifyImage
 from PIL import Image
+from PIL import ImageFilter
 import random
 import time
 
 
 def jointImage(img, imgdict):
-    img = quantifyImage(img, 4)
-    netSize = 20
+    img = quantifyImage(img, 8)
+    #img = img.filter(ImageFilter.SMOOTH_MORE)
+    netSize = 3
     new_img = Image.new(
         'RGB', (netSize * img.width, netSize * img.height), (255, 255, 255))
     for w in range(img.width):
         for h in range(img.height):
             oriRGB = img.getpixel((w, h))
-            #print('begin fillBG:%s' % time.clock())
+            # print('begin fillBG:%s' % time.clock())
             new_img = fillBG(
                 new_img, netSize * w, netSize * h, netSize, oriRGB)
-            #print('end fillBG:%s' % time.clock())
+            # print('end fillBG:%s' % time.clock())
             try:
                 components = imgdict[oriRGB]
             except KeyError:
-                #print('begin find_nearest:%s' % time.clock())
+                # print('begin find_nearest:%s' % time.clock())
                 components = find_nearest(imgdict, oriRGB)
-                #print('end find_nearest:%s' % time.clock())
-            component = random.sample(components, 1)[0]
-            c_img = Image.open('images/' + component)
+                # print('end find_nearest:%s' % time.clock())
+            c_img = random.sample(components, 1)[0]
+            m_img = Image.new('RGB', (c_img.width, c_img.height), oriRGB)
+            c_img = Image.blend(c_img.convert('RGB'), m_img, 0.8)
             #print('begin paste:%s' % time.clock())
             if c_img.width >= c_img.height:
-                c_img = c_img.resize(
-                    (netSize, round(c_img.height * netSize / c_img.width)))
                 new_img.paste(
                     c_img, (netSize * w, round(netSize * h + (netSize - c_img.height)
                                                / 2)))
             else:
-                c_img = c_img.resize(
-                    (round(c_img.width * netSize / c_img.height), netSize))
                 new_img.paste(
                     c_img, (round(netSize * w + (netSize - c_img.width) / 2), netSize
                             * h))
-            #print('end paste:%s' % time.clock())
-            c_img.close()
+            # print('end paste:%s' % time.clock())
 
     return new_img
 
 
 def fillBG(img, x, y, netSize, RGB):
-    for i in range(netSize):
-        for j in range(netSize):
-            img.putpixel((x + i, y + j), RGB)
+    img.paste(RGB, (x, y, x + netSize, y + netSize))
     return img
 
 
